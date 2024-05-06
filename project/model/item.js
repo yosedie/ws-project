@@ -18,10 +18,6 @@ Item.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    bahan: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     quantitas: {
       type: DataTypes.INTEGER,
       allowNull: false,

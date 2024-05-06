@@ -14,8 +14,24 @@ Htrans.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    member_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    kupon_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     status_transaksi: {
       type: DataTypes.STRING,
+      allowNull: false,
+    },
+    subtotal: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    grandtotal: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
   },
