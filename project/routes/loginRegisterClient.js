@@ -58,8 +58,8 @@ router.post("/api/register", async (req, res) => {
       "any.required": "Field tidak boleh kosong!",
       "string.empty": "Field tidak boleh kosong!",
     }),
-    email: Joi.email().required().messages({
-      "any.email": "Format email harus sesuai",
+    email: Joi.string().email().extend(checkEmail).required().messages({
+      "string.email": "Format email harus sesuai",
       "any.required": "Field tidak boleh kosong!",
       "string.empty": "Field tidak boleh kosong!",
     }),
@@ -82,10 +82,11 @@ router.post("/api/register", async (req, res) => {
     let statusCode = 400;
     return res.status(statusCode).send(error.toString());
   }
+  let bcrypt_password = bcrypt(password, 10);
 
   await Owner.create({
     username,
-    password,
+    password: bcrypt_password,
     name,
     email,
     no_telepon,
@@ -97,7 +98,6 @@ router.post("/api/login", [checkLogin], async (req, res) => {
   const token = jwt.sign(
     {
       username,
-      email,
     },
     JWT_KEY,
     {
@@ -106,9 +106,5 @@ router.post("/api/login", [checkLogin], async (req, res) => {
   );
   return res.status(200).json({ token: token });
 });
-
-// router.post("api/subscription", [checkLogin], async (req,res)=>{
-//   jwt.verify
-// })
 
 module.exports = router;
