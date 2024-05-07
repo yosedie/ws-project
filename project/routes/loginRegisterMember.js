@@ -67,7 +67,7 @@ router.post("/api/register", async (req, res) => {
     return res.status(statusCode).send(error.toString());
   }
 
-  let bcrypt_password = bcrypt(password, 10);
+  let bcrypt_password = await bcrypt.hashSync(password, 10);
 
   await Member.create({
     restaurant_id: 1,

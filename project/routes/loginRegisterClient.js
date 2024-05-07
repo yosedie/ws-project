@@ -7,7 +7,7 @@ const Owner = require("../model/owner.js");
 const jwt = require("jsonwebtoken");
 const JWT_KEY = "efgusguygyufegauiahf";
 const bcrypt = require("bcrypt");
-const joi=require("joi");
+const joi = require("joi");
 
 async function checkUsername(username) {
   let usernameCheck = await Owner.findOne({ where: { username: username } });
@@ -26,12 +26,19 @@ async function checkEmail(email) {
 async function checkLogin(req, res, next) {
   const { username, password } = req.body;
   if ((username, password)) {
+    let pw = await bcrypt.compareSync(password);
     let usernamePasswordCheck = Owner.findOne({
-      where: { username: username, password: password },
+      where: { username: username },
     });
     if (usernamePasswordCheck) {
-      req.body.user = usernamePasswordCheck;
-      next();
+      let pw = await bcrypt.compareSync(
+        password,
+        usernamePasswordCheck.password
+      );
+      if (pw) {
+        req.body.user = usernamePasswordCheck;
+        next();
+      }
     } else {
       return res
         .status(404)
@@ -82,7 +89,7 @@ router.post("/api/register", async (req, res) => {
     let statusCode = 400;
     return res.status(statusCode).send(error.toString());
   }
-  let bcrypt_password = bcrypt(password, 10);
+  let bcrypt_password = await bcrypt.hashSync(password, 10);
 
   await Owner.create({
     username,
