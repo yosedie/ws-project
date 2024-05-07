@@ -8,6 +8,7 @@ const Owner = require("../model/owner.js");
 const jwt = require("jsonwebtoken");
 const JWT_KEY = "efgusguygyufegauiahf";
 const bcrypt = require("bcrypt");
+const Joi = require("joi").extend(require("@joi/date"));
 
 async function checkUsername(username) {
   let usernameCheck = await Owner.findOne({ where: { username: username } });
@@ -26,12 +27,19 @@ async function checkEmail(email) {
 async function checkLogin(req, res, next) {
   const { username, password } = req.body;
   if ((username, password)) {
+    let pw = await bcrypt.compareSync(password);
     let usernamePasswordCheck = Owner.findOne({
-      where: { username: username, password: password },
+      where: { username: username },
     });
     if (usernamePasswordCheck) {
-      req.body.user = usernamePasswordCheck;
-      next();
+      let pw = await bcrypt.compareSync(
+        password,
+        usernamePasswordCheck.password
+      );
+      if (pw) {
+        req.body.user = usernamePasswordCheck;
+        next();
+      }
     } else {
       return res
         .status(404)
@@ -58,8 +66,8 @@ router.post("/api/register", async (req, res) => {
       "any.required": "Field tidak boleh kosong!",
       "string.empty": "Field tidak boleh kosong!",
     }),
-    email: Joi.email().required().messages({
-      "any.email": "Format email harus sesuai",
+    email: Joi.string().email().extend(checkEmail).required().messages({
+      "string.email": "Format email harus sesuai",
       "any.required": "Field tidak boleh kosong!",
       "string.empty": "Field tidak boleh kosong!",
     }),
@@ -82,10 +90,11 @@ router.post("/api/register", async (req, res) => {
     let statusCode = 400;
     return res.status(statusCode).send(error.toString());
   }
+  let bcrypt_password = await bcrypt.hashSync(password, 10);
 
   await Owner.create({
     username,
-    password,
+    password: bcrypt_password,
     name,
     email,
     no_telepon,
@@ -97,7 +106,6 @@ router.post("/api/login", [checkLogin], async (req, res) => {
   const token = jwt.sign(
     {
       username,
-      email,
     },
     JWT_KEY,
     {

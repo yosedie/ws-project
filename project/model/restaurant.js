@@ -26,6 +26,10 @@ Restaurant.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    api_key: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
   },
   {
     sequelize,
