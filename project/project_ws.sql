@@ -51,7 +51,7 @@ CREATE TABLE `restaurant` (
   `nama_restaurant` varchar(255) NOT NULL,
   `alamat` varchar(255) NOT NULL,
   `deskripsi` text NOT NULL,
-  `api_key` varchar(255) NOT NULL,
+  `api_key` varchar(255),
   `owner_id` int(11) NOT NULL,
   PRIMARY KEY (`restaurant_id`),
   KEY owner_id (owner_id),
