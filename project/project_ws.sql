@@ -181,6 +181,7 @@ CREATE TABLE `member` (
   `password` varchar(255) NOT NULL,
   `nama_member` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
+  `role` varchar(255) NOT NULL,
   PRIMARY KEY (`member_id`),
   KEY restaurant_id (restaurant_id),
   FOREIGN KEY (`restaurant_id`) REFERENCES `restaurant`(`restaurant_id`)
