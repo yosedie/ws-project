@@ -15,9 +15,13 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 const clientLoginRouter = require("./routes/loginRegisterClient");
 const MemberLoginRouter = require("./routes/loginRegisterMember");
+const reviewApiRouter = require("./routes/reviewApi");
+
 
 app.use("/", clientLoginRouter);
 app.use("/", MemberLoginRouter);
+app.use("/", reviewApiRouter);
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
