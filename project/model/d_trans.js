@@ -14,8 +14,16 @@ Dtrans.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    detail_transaksi: {
-      type: DataTypes.STRING,
+    menu_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    quantitas: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    subtotal: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
   },
