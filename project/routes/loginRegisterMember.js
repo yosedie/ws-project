@@ -11,19 +11,19 @@ const JWT_KEY = "efgusguygyufegauiahf";
 const bcrypt = require("bcrypt");
 const Joi = require("joi").extend(require("@joi/date"));
 
-async function checkUsername(username) {
-  let usernameCheck = await Member.findOne({ where: { username: username } });
-  if (usernameCheck) {
-    throw new Error("Username already exist");
-  }
-}
+// async function checkUsername(username) {
+//   let usernameCheck = await Member.findOne({ where: { username: username } });
+//   if (usernameCheck) {
+//     throw new Error("Username already exist");
+//   }
+// }
 
-async function checkEmail(email) {
-  let emailCheck = await Member.findOne({ where: { email: email } });
-  if (emailCheck) {
-    throw new Error("Email already exist");
-  }
-}
+// async function checkEmail(email) {
+//   let emailCheck = await Member.findOne({ where: { email: email } });
+//   if (emailCheck) {
+//     throw new Error("Email already exist");
+//   }
+// }
 
 async function checkApiKey(req, res, next) {
   const api_key = req.header("Authorization");
@@ -74,10 +74,10 @@ router.get("/api/api_key", [checkLogin], async (req, res) => {
 });
 
 //mines restaurant_id
-router.post("/api/registermember", async (req, res) => {
+router.post("/api/registermember", [checkApiKey], async (req, res) => {
   const { username, password, confirm_password, nama_member, email } = req.body;
   const schema = Joi.object({
-    username: Joi.string().required().extend(checkUsername).messages({
+    username: Joi.string().required().messages({
       "any.required": "Field tidak boleh kosong!",
       "string.empty": "Field tidak boleh kosong!",
     }),
@@ -99,7 +99,7 @@ router.post("/api/registermember", async (req, res) => {
       "any.required": "Field tidak boleh kosong!",
       "string.empty": "Field tidak boleh kosong!",
     }),
-    email: Joi.string().email().extend(checkEmail).required().messages({
+    email: Joi.string().email().required().messages({
       "string.email": "Format email harus sesuai",
       "any.required": "Field tidak boleh kosong!",
       "string.empty": "Field tidak boleh kosong!",
@@ -119,11 +119,29 @@ router.post("/api/registermember", async (req, res) => {
     return res.status(statusCode).send(error.toString());
   }
 
+  let usernameCheck = await Member.findOne({
+    where: {
+      username: username,
+      restaurant_id: req.body.restaurant.restaurant_id,
+    },
+  });
+
+  if (usernameCheck) {
+    return res.status(400).json({ messages: "Username already exist" });
+  }
+
+  let emailCheck = await Member.findOne({
+    where: { email: email, restaurant_id: req.body.restaurant.restaurant_id },
+  });
+
+  if (emailCheck) {
+    return res.status(400).json({ messages: "Email already exist" });
+  }
   let bcrypt_password = await bcrypt.hashSync(password, 10);
 
   await Member.create({
-    restaurant_id: 1,
-    // restaurant_id: req.body.restaurant.restaurant_id,
+    // restaurant_id: 1,
+    restaurant_id: req.body.restaurant.restaurant_id,
     username,
     password: bcrypt_password,
     nama_member,
