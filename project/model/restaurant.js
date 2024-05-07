@@ -4,7 +4,7 @@ const sequelize = require("../config/sequelize");
 class Restaurant extends Model {}
 Restaurant.init(
   {
-    retaurant_id: {
+    restaurant_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       autoIncrement: true,
@@ -28,7 +28,7 @@ Restaurant.init(
     },
     api_key: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
   },
   {

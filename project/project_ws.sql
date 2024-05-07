@@ -51,7 +51,7 @@ CREATE TABLE `restaurant` (
   `nama_restaurant` varchar(255) NOT NULL,
   `alamat` varchar(255) NOT NULL,
   `deskripsi` text NOT NULL,
-  `api_key` varchar(255) NOT NULL,
+  `api_key` varchar(255),
   `owner_id` int(11) NOT NULL,
   PRIMARY KEY (`restaurant_id`),
   KEY owner_id (owner_id),
@@ -201,6 +201,19 @@ CREATE TABLE `kupon` (
   KEY member_id (member_id),
   FOREIGN KEY (`restaurant_id`) REFERENCES `restaurant`(`restaurant_id`),
   FOREIGN KEY (`member_id`) REFERENCES `member`(`member_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Table structure for table `review`
+--
+
+DROP TABLE IF EXISTS `review`;
+CREATE TABLE `review` (
+  `review_id` int(11) NOT NULL AUTO_INCREMENT,
+  `owner_id` int(11) NOT NULL,
+  `comment` text NOT NULL,
+  PRIMARY KEY (`review_id`),
+  FOREIGN KEY (`owner_id`) REFERENCES `owner`(`owner_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
