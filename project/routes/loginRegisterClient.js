@@ -7,7 +7,7 @@ const Owner = require("../model/owner.js");
 const jwt = require("jsonwebtoken");
 const JWT_KEY = "efgusguygyufegauiahf";
 const bcrypt = require("bcrypt");
-const joi = require("joi");
+const Joi = require("joi").extend(require("@joi/date"));
 
 async function checkUsername(username) {
   let usernameCheck = await Owner.findOne({ where: { username: username } });
