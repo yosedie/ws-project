@@ -24,6 +24,19 @@ async function checkEmail(email) {
   }
 }
 
+async function checkApiKey(req, res, next) {
+  const api_key = req.header("Authorization");
+  let valid = await Restaurant.findOne({ where: { api_key: api_key } });
+  if (valid) {
+    let owner = await Owner.findOne({ where: { owner_id: valid.owner_id } });
+    req.body.restaurant = valid;
+    req.body.owner = owner;
+    next();
+  } else {
+    return res.status(400).json({ messages: "api_key tidak valid" });
+  }
+}
+
 async function checkLogin(req, res, next) {
   const { username, password } = req.body;
   if ((username, password)) {
@@ -98,6 +111,62 @@ router.post("/api/register", async (req, res) => {
     api_hit: 0,
   });
   return res.status(201).json({ messages: "Register Success" });
+});
+
+router.put("/api/restaurant", [checkLogin, checkApiKey], async (req, res) => {
+  const { nama_restaurant, alamat, deskripsi } = req.body;
+  const schema = Joi.object({
+    nama_restaurant: Joi.string().required().messages({
+      "any.required": "Field tidak boleh kosong!",
+      "string.empty": "Field tidak boleh kosong!",
+    }),
+    alamat: Joi.string().required().messages({
+      "any.required": "Field tidak boleh kosong!",
+      "string.empty": "Field tidak boleh kosong!",
+    }),
+    deskripsi: Joi.string().required().messages({
+      "any.required": "Field tidak boleh kosong!",
+      "string.empty": "Field tidak boleh kosong!",
+    }),
+  });
+  try {
+    await schema.validateAsync({
+      nama_restaurant,
+      alamat,
+      deskripsi,
+    });
+  } catch (error) {
+    let statusCode = 400;
+    return res.status(statusCode).send(error.toString());
+  }
+  let t_nama = null;
+  let t_alamat = null;
+  let t_deskripsi = null;
+  let resto = req.body.restaurant;
+  let update = {};
+  if (nama_restaurant) {
+    t_nama = nama_restaurant;
+  } else {
+    t_nama = resto.nama;
+  }
+  if (alamat) {
+    t_alamat = alamat;
+  } else {
+    t_alamat = resto.alamat;
+  }
+  if (deskripsi) {
+    t_deskripsi = deskripsi;
+  } else {
+    t_deskripsi = resto.deskripsi;
+  }
+
+  await Restaurant.update(
+    { nama_restaurant: t_nama, alamat: t_alamat, deskripsi: t_deskripsi },
+    {
+      where: { restaurant_id: resto.restaurant_id },
+    }
+  );
+  return res.status(200).json({ messages: "Berhasil Update data" });
 });
 
 router.post("/api/restaurant", [checkLogin], async (req, res) => {

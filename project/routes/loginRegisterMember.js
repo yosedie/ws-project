@@ -54,6 +54,40 @@ async function checkLogin(req, res, next) {
   }
 }
 
+async function checkLoginMember(req, res, next) {
+  const { username, password } = req.body;
+  let user = await Member.findOne({ where: { username: username } });
+  if (user) {
+    let pwd = bcrypt.compare(password, user.password);
+    if (pwd) {
+      req.body.user = user;
+      next();
+    } else {
+      return res.status(400).json({ messages: "Password isnt Correct" });
+    }
+  } else {
+    return res.status(400).json({ messages: "Username isnt Correct" });
+  }
+}
+
+router.post(
+  "/api/loginmember",
+  [checkApiKey, checkLoginMember],
+  async (req, res) => {
+    let user = req.body.user;
+    if (user.restaurant_id == req.body.restaurant.restaurant_id) {
+      return res.status(200).json({
+        username: user.username,
+        id: user.member_id,
+      });
+    } else {
+      return res
+        .status(400)
+        .json({ messages: "You aren't member, please register first" });
+    }
+  }
+);
+
 router.get("/api/api_key", [checkLogin], async (req, res) => {
   const { nama_restaurant } = req.body;
   let user = req.body.user;
