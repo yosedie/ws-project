@@ -37,6 +37,7 @@ CREATE TABLE `owner` (
   `name` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `no_telepon` int(11) NOT NULL,
+  `api_hit` int(11) NOT NULL,
   PRIMARY KEY (owner_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -50,6 +51,7 @@ CREATE TABLE `restaurant` (
   `nama_restaurant` varchar(255) NOT NULL,
   `alamat` varchar(255) NOT NULL,
   `deskripsi` text NOT NULL,
+  `api_key` varchar(255) NOT NULL,
   `owner_id` int(11) NOT NULL,
   PRIMARY KEY (`restaurant_id`),
   KEY owner_id (owner_id),
