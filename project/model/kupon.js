@@ -10,6 +10,10 @@ Kupon.init(
       autoIncrement: true,
       primaryKey: true,
     },
+    restaurant_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     member_id: {
       type: DataTypes.INTEGER,
       allowNull: false,

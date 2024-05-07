@@ -1,42 +1,38 @@
 const { Model, DataTypes } = require("sequelize");
 const sequelize = require("../config/sequelize");
 
-class Member extends Model {}
-Member.init(
+class Topping extends Model {}
+Topping.init(
   {
-    member_id: {
+    topping_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
       autoIncrement: true,
       primaryKey: true,
+      allowNull: false,
     },
     restaurant_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    username: {
+    nama_topping: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    password: {
+    deskripsi_topping: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    nama_member: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    email: {
-      type: DataTypes.STRING,
+    harga_topping: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
   },
   {
     sequelize,
-    modelName: "Member",
-    tableName: "member",
+    modelName: "Topping",
+    tableName: "topping",
     timestamps: false,
   }
 );
 
-module.exports = Member;
+module.exports = Topping;

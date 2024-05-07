@@ -4,6 +4,10 @@ const sequelize = require("../config/sequelize");
 class Menu_item extends Model {}
 Menu_item.init(
   {
+    restaurant_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     menu_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
