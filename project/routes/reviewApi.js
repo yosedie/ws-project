@@ -13,13 +13,17 @@ const Joi = require("joi").extend(require("@joi/date"));
 // GET all reviews
 router.get("/api/reviews", async (req, res) => {
   try {
-    const reviews = await Review.findAll();
+    const reviews = await Review.findAll({
+      where: {
+        status: 'active'
+      }
+    });
     res.json(reviews);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: 'Failed to get reviews' });
   }
 });
+
 
 // POST a new review
 router.post("/api/reviews", async (req, res) => {
