@@ -16,11 +16,14 @@ app.use(bodyParser.urlencoded({ extended: false }));
 const clientLoginRouter = require("./routes/loginRegisterClient");
 const MemberLoginRouter = require("./routes/loginRegisterMember");
 const reviewApiRouter = require("./routes/reviewApi");
+const itemApiRouter = require("./routes/itemAPI");
+
 
 
 app.use("/", clientLoginRouter);
 app.use("/", MemberLoginRouter);
 app.use("/", reviewApiRouter);
+app.use("/", itemApiRouter);
 
 
 const PORT = process.env.PORT || 3000;

@@ -114,6 +114,7 @@ CREATE TABLE `item` (
   -- `bahan` text NOT NULL,
   `quantitas` int(11) NOT NULL,
   `satuan` varchar(50) NOT NULL,
+  `status` ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
   PRIMARY KEY (`item_id`),
   KEY restaurant_id (restaurant_id),
   FOREIGN KEY (`restaurant_id`) REFERENCES `restaurant`(`restaurant_id`)
