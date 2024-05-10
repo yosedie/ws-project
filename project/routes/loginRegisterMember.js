@@ -56,17 +56,21 @@ async function checkLogin(req, res, next) {
 
 async function checkLoginMember(req, res, next) {
   const { username, password } = req.body;
-  let user = await Member.findOne({ where: { username: username } });
-  if (user) {
-    let pwd = bcrypt.compare(password, user.password);
-    if (pwd) {
-      req.body.user = user;
-      next();
+  if (username && password) {
+    let user = await Member.findOne({ where: { username: username } });
+    if (user) {
+      let pwd = bcrypt.compare(password, user.password);
+      if (pwd) {
+        req.body.user = user;
+        next();
+      } else {
+        return res.status(400).json({ messages: "Password isnt Correct" });
+      }
     } else {
-      return res.status(400).json({ messages: "Password isnt Correct" });
+      return res.status(400).json({ messages: "Username isnt Correct" });
     }
   } else {
-    return res.status(400).json({ messages: "Username isnt Correct" });
+    return res.status(400).json({ messages: "Field can't be empty" });
   }
 }
 

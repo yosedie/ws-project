@@ -196,31 +196,56 @@ router.post("/api/restaurant", [checkLogin], async (req, res) => {
     return res.status(statusCode).send(error.toString());
   }
 
-  await Restaurant.create({
-    nama_restaurant,
-    alamat,
-    deskripsi,
-    owner_id: req.body.user.owner_id,
-  });
-
-  let resId = await Restaurant.findOne({
+  let sama = await Restaurant.findOne({
     where: {
       nama_restaurant: nama_restaurant,
       owner_id: req.body.user.owner_id,
     },
   });
 
-  const payload = {
-    username: req.body.user.username,
-    restaurant_id: resId.restaurant_id,
-  };
+  if (!sama) {
+    await Restaurant.create({
+      nama_restaurant,
+      alamat,
+      deskripsi,
+      owner_id: req.body.user.owner_id,
+    });
 
-  const token = jwt.sign(payload, JWT_KEY);
+    let resId = await Restaurant.findOne({
+      where: {
+        nama_restaurant: nama_restaurant,
+        owner_id: req.body.user.owner_id,
+      },
+    });
 
-  resId.update({
-    api_key: token,
+    const payload = {
+      username: req.body.user.username,
+      restaurant_id: resId.restaurant_id,
+    };
+
+    const token = jwt.sign(payload, JWT_KEY);
+
+    resId.update({
+      api_key: token,
+    });
+    return res
+      .status(201)
+      .json({ messages: "Berhasil menambahkan Restaurant" });
+  } else {
+    return res.status(400).json({ messages: "Restaurant sudah ada" });
+  }
+});
+
+router.get("/api/restaurant", [checkLogin], async (req, res) => {
+  let resto = await Restaurant.findAll({
+    where: { owner_id: req.body.user.owner_id },
   });
-  return res.status(201).json({ messages: "Berhasil menambahkan Restaurant" });
+  return res.status(200).json({ Restaurant: resto });
+});
+
+router.get("/api/client", async (req, res) => {
+  let client = Owner.findAll();
+  return res.status(200).json({ client: client });
 });
 
 module.exports = router;
