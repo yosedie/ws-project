@@ -244,7 +244,7 @@ router.get("/api/restaurant", [checkLogin], async (req, res) => {
 });
 
 router.get("/api/client", async (req, res) => {
-  let client = Owner.findAll();
+  let client = await Owner.findAll();
   return res.status(200).json({ client: client });
 });
 
