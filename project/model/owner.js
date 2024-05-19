@@ -30,6 +30,10 @@ Owner.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    api_hit: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
   },
   {
     sequelize,
