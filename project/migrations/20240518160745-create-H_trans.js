@@ -24,7 +24,7 @@ module.exports = {
         allowNull: false,
       },
       status_transaksi: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
       subtotal: {

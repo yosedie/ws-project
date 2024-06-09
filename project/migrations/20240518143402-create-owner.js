@@ -28,7 +28,7 @@ module.exports = {
         allowNull: false,
       },
       no_telepon: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
       },
       api_hit: {

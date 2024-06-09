@@ -13,6 +13,10 @@ Review.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    member_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     comment: {
       type: DataTypes.TEXT,
       allowNull: false,

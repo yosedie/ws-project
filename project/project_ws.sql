@@ -36,7 +36,7 @@ CREATE TABLE `owner` (
   `password` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
-  `no_telepon` int(11) NOT NULL,
+  `no_telepon` varchar(255) NOT NULL,
   `api_hit` int(11) NOT NULL,
   PRIMARY KEY (owner_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -161,7 +161,7 @@ CREATE TABLE `menu_item` (
   `restaurant_id` int(11) NOT NULL,
   `menu_id` int(11) NOT NULL,
   `item_id` int(11) NOT NULL,
-  `needed_quantity` decimal(10,2) NOT NULL,
+  `needed_quantity` int(11) NOT NULL,
   KEY menu_id (menu_id),
   KEY item_id (item_id),
   KEY restaurant_id (restaurant_id),
@@ -213,11 +213,14 @@ DROP TABLE IF EXISTS `review`;
 CREATE TABLE `review` (
   `review_id` int(11) NOT NULL AUTO_INCREMENT,
   `restaurant_id` int(11) NOT NULL,
+  `member_id` int(11) NOT NULL,
   `comment` text NOT NULL,
   `status` ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
   PRIMARY KEY (`review_id`),
   KEY restaurant_id (restaurant_id),
-  FOREIGN KEY (`restaurant_id`) REFERENCES `restaurant`(`restaurant_id`)
+  KEY member_id (member_id),
+  FOREIGN KEY (`restaurant_id`) REFERENCES `restaurant`(`restaurant_id`),
+  FOREIGN KEY (`member_id`) REFERENCES `member`(`member_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
