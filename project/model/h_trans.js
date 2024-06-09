@@ -38,7 +38,7 @@ Htrans.init(
   {
     sequelize,
     modelName: "Htrans",
-    tableName: "h_trans",
+    tableName: "H_trans",
     timestamps: false,
   }
 );

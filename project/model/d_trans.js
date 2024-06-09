@@ -30,7 +30,7 @@ Dtrans.init(
   {
     sequelize,
     modelName: "Dtrans",
-    tableName: "d_trans",
+    tableName: "D_trans",
     timestamps: false,
   }
 );
