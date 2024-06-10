@@ -113,7 +113,7 @@ CREATE TABLE `item` (
   `restaurant_id` int(11) NOT NULL,
   -- `bahan` text NOT NULL,
   `quantitas` int(11) NOT NULL,
-  `satuan` varchar(50) NOT NULL,
+  `satuan` varchar(255) NOT NULL,
   `status` ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
   PRIMARY KEY (`item_id`),
   KEY restaurant_id (restaurant_id),
