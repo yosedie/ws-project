@@ -98,8 +98,12 @@ router.post("/api/register", async (req, res) => {
       no_telepon,
     });
   } catch (error) {
-    let statusCode = 400;
-    return res.status(statusCode).send(error.toString());
+    let code = 400;
+    let errorMsg = error.toString().split(": ")[1];
+    errorMsg = errorMsg.split(" (")[0];
+    return res.status(code).json({
+      messages: errorMsg,
+    });
   }
   let bcrypt_password = await bcrypt.hashSync(password, 10);
 
@@ -137,8 +141,12 @@ router.put("/api/restaurant", [checkLogin, checkApiKey], async (req, res) => {
       deskripsi,
     });
   } catch (error) {
-    let statusCode = 400;
-    return res.status(statusCode).send(error.toString());
+    let code = 400;
+    let errorMsg = error.toString().split(": ")[1];
+    errorMsg = errorMsg.split(" (")[0];
+    return res.status(code).json({
+      messages: errorMsg,
+    });
   }
   let t_nama = null;
   let t_alamat = null;
@@ -193,8 +201,12 @@ router.post("/api/restaurant", [checkLogin], async (req, res) => {
       deskripsi,
     });
   } catch (error) {
-    let statusCode = 400;
-    return res.status(statusCode).send(error.toString());
+    let code = 400;
+    let errorMsg = error.toString().split(": ")[1];
+    errorMsg = errorMsg.split(" (")[0];
+    return res.status(code).json({
+      messages: errorMsg,
+    });
   }
 
   let sama = await Restaurant.findOne({
@@ -268,10 +280,10 @@ function safeStringify(obj) {
   });
 }
 
-let loggedUser
+let loggedUser;
 router.post("/api/subscription/charge", [checkLogin], async (req, res) => {
-  const { buy_amount } = req.body
-  const midtransClient = require('midtrans-client');
+  const { buy_amount } = req.body;
+  const midtransClient = require("midtrans-client");
 
   if (!buy_amount || parseInt(buy_amount) <= 1) {
     return res.status(500).send("DANCOK KASI BUY AMOUNT DONG");
@@ -292,22 +304,24 @@ router.post("/api/subscription/charge", [checkLogin], async (req, res) => {
       client_key: core.apiConfig.clientKey,
     };
 
-    core.cardToken(parameter)
+    core
+      .cardToken(parameter)
       .then((cardTokenResponse) => {
-       
         const parameter = {
-          "payment_type": "credit_card",
-          "transaction_details": {
-            "gross_amount": buy_amount ?? 1,
-            "order_id": `SUBSCRIPTION-${Math.floor(Math.random() * 90000000) + 10000000}`,
+          payment_type: "credit_card",
+          transaction_details: {
+            gross_amount: buy_amount ?? 1,
+            order_id: `SUBSCRIPTION-${
+              Math.floor(Math.random() * 90000000) + 10000000
+            }`,
           },
         };
         return core.charge(parameter);
       })
       .then((e) => {
-        if(e.status_code == '201') {
-          const {owner_id, api_hit} = {...req.body.user.dataValues}
-          loggedUser = {owner_id, api_hit}
+        if (e.status_code == "201") {
+          const { owner_id, api_hit } = { ...req.body.user.dataValues };
+          loggedUser = { owner_id, api_hit };
           return res.status(201).json({
             message: e.status_message,
             status: e.transaction_status,
@@ -331,15 +345,19 @@ router.post("/api/subscription/charge", [checkLogin], async (req, res) => {
   }
 });
 
-router.post('/payment-webhook', async (req, res) => {
+router.post("/payment-webhook", async (req, res) => {
   const paymentInfo = req.body;
-  if (paymentInfo.transaction_status === 'capture') {
+  if (paymentInfo.transaction_status === "capture") {
     if (paymentInfo.order_id.includes("SUBSCRIPTION") && loggedUser) {
-      if(Number.isInteger(loggedUser.owner_id) && Number.isInteger(loggedUser.api_hit)) {
-        const owner = await Owner.findByPk(loggedUser.owner_id)
-        if(owner) {
-          owner.api_hit = loggedUser.api_hit + (parseInt(paymentInfo.gross_amount) / 500)
-          await owner.save()
+      if (
+        Number.isInteger(loggedUser.owner_id) &&
+        Number.isInteger(loggedUser.api_hit)
+      ) {
+        const owner = await Owner.findByPk(loggedUser.owner_id);
+        if (owner) {
+          owner.api_hit =
+            loggedUser.api_hit + parseInt(paymentInfo.gross_amount) / 500;
+          await owner.save();
         }
       }
     }
