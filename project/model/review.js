@@ -9,30 +9,6 @@ Review.init(
         autoIncrement: true,
         primaryKey: true,
       },
-      owner_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      comment: {
-        type: DataTypes.TEXT,
-        allowNull: false,
-      },
-      status: {
-        type: DataTypes.ENUM('active', 'inactive'),
-        allowNull: false,
-        defaultValue: 'active',
-      },
-    },
-<<<<<<< Updated upstream
-    {
-      sequelize,
-      modelName: "Review",
-      tableName: "review",
-      timestamps: false,
-    }
-  );
-module.exports = Review;
-=======
     restaurant_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -59,4 +35,3 @@ module.exports = Review;
   }
 );
 module.exports = Review;
->>>>>>> Stashed changes
