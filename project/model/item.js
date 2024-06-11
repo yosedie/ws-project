@@ -7,7 +7,7 @@ Item.init(
     item_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      autoIncrement: true,
+      autoIncrement: false,
       primaryKey: true,
     },
     nama_item: {

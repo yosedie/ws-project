@@ -22,6 +22,10 @@ Kupon.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    masa_berlaku: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
   },
   {
     sequelize,

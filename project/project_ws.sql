@@ -197,6 +197,7 @@ CREATE TABLE `kupon` (
   `restaurant_id` int(11) NOT NULL,
   `member_id` int(11) NOT NULL,
   `potongan` int(11) NOT NULL,
+  `masa_berlaku` DATE NOT NULL,
   PRIMARY KEY (`kupon_id`),
   KEY restaurant_id (restaurant_id),
   KEY member_id (member_id),
