@@ -1,3 +1,4 @@
+"use strict";
 const { Model, DataTypes } = require("sequelize");
 const sequelize = require("../config/sequelize");
 
@@ -27,7 +28,7 @@ Owner.init(
       allowNull: false,
     },
     no_telepon: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: false,
     },
     api_hit: {

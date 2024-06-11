@@ -27,9 +27,9 @@ Item.init(
       allowNull: false,
     },
     status: {
-      type: DataTypes.ENUM('active', 'inactive'),
+      type: DataTypes.ENUM("active", "inactive"),
       allowNull: false,
-      defaultValue: 'active',
+      defaultValue: "active",
     },
   },
   {

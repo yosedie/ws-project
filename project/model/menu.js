@@ -18,7 +18,11 @@ Menu.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    item_id: {
+    deskripsi_menu: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    harga_menu: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },

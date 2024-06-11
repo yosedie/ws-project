@@ -23,7 +23,7 @@ Htrans.init(
       allowNull: false,
     },
     status_transaksi: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     subtotal: {
@@ -38,7 +38,7 @@ Htrans.init(
   {
     sequelize,
     modelName: "Htrans",
-    tableName: "h_trans",
+    tableName: "H_trans",
     timestamps: false,
   }
 );
