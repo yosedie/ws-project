@@ -67,7 +67,7 @@ CREATE TABLE `H_trans` (
   `trans_id` int(11) NOT NULL AUTO_INCREMENT,
   `restaurant_id` int(11) NOT NULL,
   `member_id` int(11) NOT NULL,
-  `kupon_id` int(11) NOT NULL,
+  `kupon_id` int(11),
   `status_transaksi` int(5) NOT NULL, -- 0 br dibuat, 1 payment sdh lunas, 2 dibuat resto, 3 sukses, 4 gagal
   `subtotal` int(11) NOT NULL,
   `grand_total` int(11) NOT NULL,

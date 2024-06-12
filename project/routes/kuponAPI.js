@@ -69,7 +69,7 @@ async function checkLoginMember(req, res, next) {
   if (username && password) {
     let user = await Member.findOne({ where: { username: username } });
     if (user) {
-      let pwd = bcrypt.compare(password, user.password);
+      let pwd = await bcrypt.compare(password, user.password);
       if (pwd) {
         req.body.user = user;
         next();
@@ -81,6 +81,37 @@ async function checkLoginMember(req, res, next) {
     }
   } else {
     return res.status(400).json({ messages: "Field can't be empty" });
+  }
+}
+
+async function checkLoginAdmin(req, res, next) {
+  const { username, password } = req.body;
+  if (!username || !password) {
+    return res.status(400).json({ messages: "Field can't be empty" });
+  }
+
+  let resto = req.body.dataKey;
+  let user = await Member.findOne({ where: { username: username } });
+
+  if (!user) {
+    return res.status(400).json({ messages: "Username isnt Correct" });
+  }
+
+  if (resto.restaurant_id != user.restaurant_id) {
+    return res.status(400).json({ messages: "Username tidak ditemukan" });
+  }
+
+  let pwd = await bcrypt.compare(password, user.password);
+  if (pwd) {
+    if (user.role != "admin") {
+      return res
+        .status(403)
+        .json({ messages: "not authorized, only admin can access it" });
+    }
+    req.body.user = user;
+    next();
+  } else {
+    return res.status(400).json({ messages: "Password isnt Correct" });
   }
 }
 
@@ -104,7 +135,7 @@ router.get(
 // POST a new kupon
 router.post(
   "/api/v1/kupons",
-  [checkApiKey, checkLoginMember, checkApiHit],
+  [checkApiKey, checkLoginAdmin, checkApiHit],
   async (req, res) => {
     const { potongan, masa_berlaku } = req.body;
     let resto = req.body.resto;
@@ -135,7 +166,7 @@ router.post(
 // PUT update an existing kupon
 router.put(
   "/api/v1/kupons/:id",
-  [checkApiKey, checkLoginMember, checkApiHit],
+  [checkApiKey, checkLoginAdmin, checkApiHit],
   async (req, res) => {
     const { potongan, masa_berlaku } = req.body;
     const kuponId = req.params.id;
@@ -164,7 +195,7 @@ router.put(
 // DELETE a kupon (destroy it)
 router.delete(
   "/api/v1/kupons/:id",
-  [checkApiKey, checkLoginMember, checkApiHit],
+  [checkApiKey, checkLoginAdmin, checkApiHit],
   async (req, res) => {
     const kuponId = req.params.id;
     let owner = req.body.owner;

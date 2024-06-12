@@ -64,6 +64,47 @@ async function cekBahan(bahan, resto) {
   }
 }
 
+async function cekMenu(menu, resto) {
+  const schema = Joi.object({
+    menu_id: Joi.number().required().messages({
+      "any.required": "Semua field menu wajib diisi",
+    }),
+    needed_quantity: Joi.number().min(1).required().messages({
+      "any.required": "Semua field qty wajib diisi",
+      "number.min": "{{#label}} minimal 1",
+    }),
+  });
+
+  let hasil = [];
+
+  try {
+    for (let i = 0; i < menu.length; i++) {
+      const e = menu[i];
+      await schema.validateAsync(e);
+      let item = await Menu.findOne({
+        where: {
+          menu_id: e.menu_id,
+          restaurant_id: resto.restaurant_id,
+          status: "active",
+        },
+      });
+
+      if (!item) {
+        throw new Error("Menu dengan id " + e.menu_id + " tidak ditemukan");
+      }
+
+      hasil.push({
+        menu_id: parseInt(e.menu_id),
+        harga_menu: item.harga_menu,
+        needed_quantity: parseInt(e.needed_quantity),
+      });
+    }
+    return hasil;
+  } catch (error) {
+    throw error;
+  }
+}
+
 // middleware
 async function checkApiKey(req, res, next) {
   const api_key = req.header("Authorization");
@@ -102,7 +143,7 @@ async function checkLoginAdmin(req, res, next) {
     return res.status(400).json({ messages: "Username tidak ditemukan" });
   }
 
-  let pwd = bcrypt.compare(password, user.password);
+  let pwd = await bcrypt.compare(password, user.password);
   if (pwd) {
     if (user.role != "admin") {
       return res
@@ -113,6 +154,26 @@ async function checkLoginAdmin(req, res, next) {
     next();
   } else {
     return res.status(400).json({ messages: "Password isnt Correct" });
+  }
+}
+
+async function checkLoginMember(req, res, next) {
+  const { username, password } = req.body;
+  if (username && password) {
+    let user = await Member.findOne({ where: { username: username } });
+    if (user) {
+      let pwd = await bcrypt.compare(password, user.password);
+      if (pwd) {
+        req.body.user = user;
+        next();
+      } else {
+        return res.status(400).json({ messages: "Password isnt Correct" });
+      }
+    } else {
+      return res.status(400).json({ messages: "Username isnt Correct" });
+    }
+  } else {
+    return res.status(400).json({ messages: "Field can't be empty" });
   }
 }
 
@@ -843,6 +904,80 @@ router.delete(
 
     return res.status(200).json({
       messages: "menu berhasil di delete",
+    });
+  }
+);
+
+// let coba = [
+//   {
+//     menu_id: 1,
+//     needed_quantity: 4,
+//   },
+// ];
+// hitung total harga menu dan jum menu di cart
+router.get(
+  "/api/v1/cart",
+  [checkApiKey, checkLoginMember, checkApiHit],
+  async function (req, res) {
+    let resto = req.body.resto;
+    let owner = req.body.owner;
+
+    let { menus } = req.query;
+
+    // return res.status(200).json(menus);
+
+    const schema = Joi.object({
+      menus: Joi.required().messages({
+        "any.required": "Field tidak boleh kosong!",
+      }),
+    });
+
+    try {
+      await schema.validateAsync({
+        menus,
+      });
+    } catch (error) {
+      let code = 400;
+      let errorMsg = error.toString().split(": ")[1];
+      errorMsg = errorMsg.split(" (")[0];
+      return res.status(code).json({
+        messages: errorMsg,
+      });
+    }
+    console.log(menus);
+    let isiCart = null;
+    //cek bahan-bahan
+    if (Array.isArray(menus)) {
+      try {
+        isiCart = await cekMenu(menus, resto);
+      } catch (error) {
+        let code = 400;
+        let errorMsg = error.toString().split(": ")[1];
+        errorMsg = errorMsg.split(" (")[0];
+        if (errorMsg.includes("Menu dengan id")) code = 404;
+        return res.status(code).json({
+          messages: errorMsg,
+        });
+      }
+    } else {
+      return res
+        .status(400)
+        .json({ message: "menu di cart harus dalam bentuk array" });
+    }
+    // console.log(isiCart);
+    let total = 0;
+    for (let i = 0; i < isiCart.length; i++) {
+      const e = isiCart[i];
+      total += e.harga_menu * e.needed_quantity;
+    }
+
+    await kurangiApiHit(owner);
+
+    return res.status(200).json({
+      cart: {
+        jumlah_item: isiCart.length,
+        total_harga: total,
+      },
     });
   }
 );
