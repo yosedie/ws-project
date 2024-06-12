@@ -200,6 +200,13 @@ router.put(
 
 router.post("/api/v1/restaurant", [checkLogin], async (req, res) => {
   const { nama_restaurant, alamat, deskripsi } = req.body;
+  const {
+    username_admin,
+    password_admin,
+    confirm_password_admin,
+    nama_admin,
+    email_admin,
+  } = req.body;
   const schema = Joi.object({
     nama_restaurant: Joi.string().required().messages({
       "any.required": "Field tidak boleh kosong!",
@@ -257,14 +264,6 @@ router.post("/api/v1/restaurant", [checkLogin], async (req, res) => {
     resId.update({
       api_key: token,
     });
-
-    const {
-      username_admin,
-      password_admin,
-      confirm_password_admin,
-      nama_admin,
-      email_admin,
-    } = req.body;
 
     const schema = Joi.object({
       username_admin: Joi.string().required().messages({
