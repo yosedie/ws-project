@@ -131,6 +131,7 @@ CREATE TABLE `menu` (
   `nama_menu` varchar(255) NOT NULL,
   `deskripsi_menu` text NOT NULL,
   `harga_menu` int(11) NOT NULL,
+  `status` ENUM('active','habis','inactive') NOT NULL DEFAULT 'active',
   PRIMARY KEY (`menu_id`),
   KEY restaurant_id (restaurant_id),
   FOREIGN KEY (`restaurant_id`) REFERENCES `restaurant`(`restaurant_id`)
@@ -158,10 +159,12 @@ CREATE TABLE `topping` (
 
 DROP TABLE IF EXISTS `menu_item`;
 CREATE TABLE `menu_item` (
+  `menu_item_id` int(11) NOT NULL AUTO_INCREMENT,
   `restaurant_id` int(11) NOT NULL,
   `menu_id` int(11) NOT NULL,
   `item_id` int(11) NOT NULL,
   `needed_quantity` int(11) NOT NULL,
+  PRIMARY KEY (`menu_item_id`),
   KEY menu_id (menu_id),
   KEY item_id (item_id),
   KEY restaurant_id (restaurant_id),
