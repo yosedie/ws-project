@@ -23,6 +23,10 @@ module.exports = {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+      masa_berlaku: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
     });
 
     await queryInterface.addConstraint("kupon", {
