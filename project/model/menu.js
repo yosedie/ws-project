@@ -26,6 +26,11 @@ Menu.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    status: {
+      type: DataTypes.ENUM("active", "habis", "inactive"),
+      allowNull: false,
+      defaultValue: "active",
+    },
   },
   {
     sequelize,
