@@ -188,12 +188,13 @@ router.put(
     });
 
     if (error) return res.status(400).json({ error: error.details[0].message });
-
+    
     try {
       const review = await Review.findOne({
         where: {
           review_id: reviewId,
           restaurant_id: resto.restaurant_id,
+          status: 'active',  // Tambahkan kondisi status harus 'active'
         },
       });
       if (!review) throw new Error("Review not found");
