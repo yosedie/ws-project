@@ -2,37 +2,13 @@ const { Model, DataTypes } = require("sequelize");
 const sequelize = require("../config/sequelize");
 class Review extends Model {}
 Review.init(
-    {
-      review_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-      },
-      owner_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      comment: {
-        type: DataTypes.TEXT,
-        allowNull: false,
-      },
-      status: {
-        type: DataTypes.ENUM('active', 'inactive'),
-        allowNull: false,
-        defaultValue: 'active',
-      },
+  {
+    review_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
     },
-<<<<<<< Updated upstream
-    {
-      sequelize,
-      modelName: "Review",
-      tableName: "review",
-      timestamps: false,
-    }
-  );
-module.exports = Review;
-=======
     restaurant_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -46,9 +22,9 @@ module.exports = Review;
       allowNull: false,
     },
     status: {
-      type: DataTypes.ENUM('active', 'inactive'),
+      type: DataTypes.ENUM("active", "inactive"),
       allowNull: false,
-      defaultValue: 'active',
+      defaultValue: "active",
     },
   },
   {
@@ -59,4 +35,3 @@ module.exports = Review;
   }
 );
 module.exports = Review;
->>>>>>> Stashed changes
