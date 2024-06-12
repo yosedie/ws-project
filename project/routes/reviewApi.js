@@ -14,7 +14,7 @@ const reviewSchema = Joi.object({
   restaurant_id: Joi.number().integer().required(),
   member_id: Joi.number().integer().required(),
   comment: Joi.string().required(),
-  status: Joi.string().valid('active', 'inactive').optional(),
+  status: Joi.string().valid("active", "inactive").optional(),
 });
 
 // GET all active reviews
@@ -22,13 +22,13 @@ router.get("/api/reviews", async (req, res) => {
   try {
     const reviews = await Review.findAll({
       where: {
-        status: 'active'
-      }
+        status: "active",
+      },
     });
     res.json(reviews);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Failed to get reviews' });
+    res.status(500).json({ error: "Failed to get reviews" });
   }
 });
 
@@ -38,12 +38,12 @@ router.get("/api/reviews/:id", async (req, res) => {
   try {
     const review = await Review.findByPk(reviewId);
     if (!review) {
-      return res.status(404).json({ error: 'Review not found' });
+      return res.status(404).json({ error: "Review not found" });
     }
     res.json(review);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Failed to get review' });
+    res.status(500).json({ error: "Failed to get review" });
   }
 });
 
@@ -59,7 +59,7 @@ router.post("/api/reviews", async (req, res) => {
     res.status(201).json(newReview);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Failed to create review' });
+    res.status(500).json({ error: "Failed to create review" });
   }
 });
 
@@ -71,7 +71,7 @@ router.put("/api/reviews/:id", async (req, res) => {
 
   try {
     const review = await Review.findByPk(reviewId);
-    if (!review) throw new Error('Review not found');
+    if (!review) throw new Error("Review not found");
 
     // Update data review
     await review.update(req.body);
@@ -79,7 +79,7 @@ router.put("/api/reviews/:id", async (req, res) => {
     res.json(review);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Failed to update review' });
+    res.status(500).json({ error: "Failed to update review" });
   }
 });
 
@@ -88,15 +88,15 @@ router.delete("/api/reviews/:id", async (req, res) => {
   const reviewId = req.params.id;
   try {
     const review = await Review.findByPk(reviewId);
-    if (!review) throw new Error('Review not found');
+    if (!review) throw new Error("Review not found");
 
     // Menonaktifkan review
-    await review.update({ status: 'inactive' });
+    await review.update({ status: "inactive" });
 
     res.json(review);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Failed to delete review' });
+    res.status(500).json({ error: "Failed to delete review" });
   }
 });
 
