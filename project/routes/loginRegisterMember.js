@@ -42,7 +42,7 @@ async function checkLogin(req, res, next) {
   const { username, password } = req.body;
   let user = await Owner.findOne({ where: { username: username } });
   if (user) {
-    let pwd = bcrypt.compare(password, user.password);
+    let pwd = await bcrypt.compare(password, user.password);
     if (pwd) {
       req.body.user = user;
       next();
@@ -59,7 +59,7 @@ async function checkLoginMember(req, res, next) {
   if (username && password) {
     let user = await Member.findOne({ where: { username: username } });
     if (user) {
-      let pwd = bcrypt.compare(password, user.password);
+      let pwd = await bcrypt.compare(password, user.password);
       if (pwd) {
         req.body.user = user;
         next();
