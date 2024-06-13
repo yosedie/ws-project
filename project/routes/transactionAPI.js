@@ -178,7 +178,7 @@ async function checkApiKey(req, res, next) {
                     payment_type: "credit_card",
                     transaction_details: {
                         gross_amount: trans.grand_total,
-                        order_id: `SUBSCRIPTION-${Math.floor(Math.random() * 90000000) + 10000000}`
+                        order_id: `TRANSACTION-${Math.floor(Math.random() * 90000000) + 10000000}`
                     },
                     credit_card: {
                         token_id: cardTokenResponse.token_id,
@@ -348,7 +348,6 @@ router.post("/api/topup", [checkLogin], async (req, res) => {
         if(e.status_code == '201') {
           const {owner_id, api_hit} = {...req.body.user.dataValues}
           loggedUser = {owner_id, api_hit}
-          console.log(loggedUser)
           return res.status(201).json({
             message: e.status_message,
             status: e.transaction_status,
@@ -378,7 +377,7 @@ router.post("/api/topup", [checkLogin], async (req, res) => {
 router.post('/payment-webhook', async (req, res) => {
   const paymentInfo = req.body;
   if (paymentInfo.transaction_status === 'capture') {
-    if (paymentInfo.order_id.includes("TOPUP") && loggedUser) {
+    if ((paymentInfo.order_id.includes("TOPUP") || paymentInfo.order_id.includes("TRANSACTION")) && loggedUser) {
       if(Number.isInteger(loggedUser.owner_id) && Number.isInteger(loggedUser.api_hit)) {
         const owner = await Owner.findByPk(loggedUser.owner_id)
         if(owner) {
