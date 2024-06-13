@@ -128,6 +128,7 @@ DROP TABLE IF EXISTS `menu`;
 CREATE TABLE `menu` (
   `menu_id` int(11) NOT NULL AUTO_INCREMENT,
   `restaurant_id` int(11) NOT NULL,
+  `menu_picture` text,
   `nama_menu` varchar(255) NOT NULL,
   `deskripsi_menu` text NOT NULL,
   `harga_menu` int(11) NOT NULL,
@@ -181,6 +182,7 @@ DROP TABLE IF EXISTS `member`;
 CREATE TABLE `member` (
   `member_id` int(11) NOT NULL AUTO_INCREMENT,
   `restaurant_id` int(11) NOT NULL,
+  `member_picture` text,
   `username` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `nama_member` varchar(255) NOT NULL,

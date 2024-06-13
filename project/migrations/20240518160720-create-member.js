@@ -15,6 +15,10 @@ module.exports = {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+      member_picture: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       username: {
         type: DataTypes.STRING,
         allowNull: false,
