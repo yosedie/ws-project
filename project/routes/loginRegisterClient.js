@@ -18,6 +18,13 @@ async function checkUsername(username) {
   }
 }
 
+async function checkNoTelp(notelp) {
+  let NoTelpCheck = await Owner.findOne({ where: { no_telepon: notelp } });
+  if (NoTelpCheck) {
+    throw new Error("Telephone Number already exist");
+  }
+}
+
 async function checkEmail(email) {
   let emailCheck = await Owner.findOne({ where: { email: email } });
   if (emailCheck) {
@@ -27,14 +34,18 @@ async function checkEmail(email) {
 
 async function checkApiKey(req, res, next) {
   const api_key = req.header("Authorization");
-  let valid = await Restaurant.findOne({ where: { api_key: api_key } });
-  if (valid) {
-    let owner = await Owner.findOne({ where: { owner_id: valid.owner_id } });
-    req.body.restaurant = valid;
-    req.body.owner = owner;
-    next();
+  if (api_key) {
+    let valid = await Restaurant.findOne({ where: { api_key: api_key } });
+    if (valid) {
+      let owner = await Owner.findOne({ where: { owner_id: valid.owner_id } });
+      req.body.restaurant = valid;
+      req.body.owner = owner;
+      next();
+    } else {
+      return res.status(400).json({ messages: "api_key tidak valid" });
+    }
   } else {
-    return res.status(400).json({ messages: "api_key tidak valid" });
+    return res.status(403).json({ messages: "forbidden" });
   }
 }
 
@@ -61,7 +72,7 @@ async function checkLogin(req, res, next) {
   }
 }
 
-router.post("/api/register", async (req, res) => {
+router.post("/api/v1/register", async (req, res) => {
   const { username, password, name, email, no_telepon } = req.body;
   const schema = Joi.object({
     username: Joi.string().required().external(checkUsername).messages({
@@ -82,12 +93,17 @@ router.post("/api/register", async (req, res) => {
       "any.required": "Field tidak boleh kosong!",
       "string.empty": "Field tidak boleh kosong!",
     }),
-    no_telepon: Joi.string().min(8).max(13).required().messages({
-      "any.required": "Field tidak boleh kosong!",
-      "string.empty": "Field tidak boleh kosong!",
-      "string.min": "Nomor telephone minimal 8 digit",
-      "string.max": "Nomor telephone minimal 8 digit",
-    }),
+    no_telepon: Joi.string()
+      .min(8)
+      .max(13)
+      .external(checkNoTelp)
+      .required()
+      .messages({
+        "any.required": "Field tidak boleh kosong!",
+        "string.empty": "Field tidak boleh kosong!",
+        "string.min": "Nomor telephone minimal 8 digit",
+        "string.max": "Nomor telephone minimal 8 digit",
+      }),
   });
   try {
     await schema.validateAsync({
@@ -98,8 +114,12 @@ router.post("/api/register", async (req, res) => {
       no_telepon,
     });
   } catch (error) {
-    let statusCode = 400;
-    return res.status(statusCode).send(error.toString());
+    let code = 400;
+    let errorMsg = error.toString().split(": ")[1];
+    errorMsg = errorMsg.split(" (")[0];
+    return res.status(code).json({
+      messages: errorMsg,
+    });
   }
   let bcrypt_password = await bcrypt.hashSync(password, 10);
 
@@ -114,64 +134,83 @@ router.post("/api/register", async (req, res) => {
   return res.status(201).json({ messages: "Register Success" });
 });
 
-router.put("/api/restaurant", [checkLogin, checkApiKey], async (req, res) => {
-  const { nama_restaurant, alamat, deskripsi } = req.body;
-  const schema = Joi.object({
-    nama_restaurant: Joi.string().required().messages({
-      "any.required": "Field tidak boleh kosong!",
-      "string.empty": "Field tidak boleh kosong!",
-    }),
-    alamat: Joi.string().required().messages({
-      "any.required": "Field tidak boleh kosong!",
-      "string.empty": "Field tidak boleh kosong!",
-    }),
-    deskripsi: Joi.string().required().messages({
-      "any.required": "Field tidak boleh kosong!",
-      "string.empty": "Field tidak boleh kosong!",
-    }),
-  });
-  try {
-    await schema.validateAsync({
-      nama_restaurant,
-      alamat,
-      deskripsi,
+router.put(
+  "/api/v1/restaurant",
+  [checkLogin, checkApiKey],
+  async (req, res) => {
+    const { nama_restaurant, alamat, deskripsi } = req.body;
+    const schema = Joi.object({
+      nama_restaurant: Joi.string().messages({
+        "any.required": "Field tidak boleh kosong!",
+        "string.empty": "Field tidak boleh kosong!",
+      }),
+      alamat: Joi.string().messages({
+        "any.required": "Field tidak boleh kosong!",
+        "string.empty": "Field tidak boleh kosong!",
+      }),
+      deskripsi: Joi.string().messages({
+        "any.required": "Field tidak boleh kosong!",
+        "string.empty": "Field tidak boleh kosong!",
+      }),
     });
-  } catch (error) {
-    let statusCode = 400;
-    return res.status(statusCode).send(error.toString());
-  }
-  let t_nama = null;
-  let t_alamat = null;
-  let t_deskripsi = null;
-  let resto = req.body.restaurant;
-  let update = {};
-  if (nama_restaurant) {
-    t_nama = nama_restaurant;
-  } else {
-    t_nama = resto.nama;
-  }
-  if (alamat) {
-    t_alamat = alamat;
-  } else {
-    t_alamat = resto.alamat;
-  }
-  if (deskripsi) {
-    t_deskripsi = deskripsi;
-  } else {
-    t_deskripsi = resto.deskripsi;
-  }
-
-  await Restaurant.update(
-    { nama_restaurant: t_nama, alamat: t_alamat, deskripsi: t_deskripsi },
-    {
-      where: { restaurant_id: resto.restaurant_id },
+    try {
+      await schema.validateAsync({
+        nama_restaurant,
+        alamat,
+        deskripsi,
+      });
+    } catch (error) {
+      let statusCode = 400;
+      return res.status(statusCode).send(error.toString());
     }
-  );
-  return res.status(200).json({ messages: "Berhasil Update data" });
-});
+    let t_nama = null;
+    let t_alamat = null;
+    let t_deskripsi = null;
+    let resto = req.body.restaurant;
+    let update = {};
+    if (nama_restaurant) {
+      t_nama = nama_restaurant;
+    } else {
+      t_nama = resto.nama;
+    }
+    if (alamat) {
+      t_alamat = alamat;
+    } else {
+      t_alamat = resto.alamat;
+    }
+    if (deskripsi) {
+      t_deskripsi = deskripsi;
+    } else {
+      t_deskripsi = resto.deskripsi;
+    }
 
-router.post("/api/restaurant", [checkLogin], async (req, res) => {
+    let updateKembar = await Restaurant.findOne({
+      where: { nama_restaurant: t_nama },
+    });
+
+    if (updateKembar) {
+      return res.status(400).json({ messages: "Restaurant already exist" });
+    } else {
+      await Restaurant.update(
+        { nama_restaurant: t_nama, alamat: t_alamat, deskripsi: t_deskripsi },
+        {
+          where: { restaurant_id: resto.restaurant_id },
+        }
+      );
+      return res.status(200).json({ messages: "Berhasil Update data" });
+    }
+  }
+);
+
+router.post("/api/v1/restaurant", [checkLogin], async (req, res) => {
   const { nama_restaurant, alamat, deskripsi } = req.body;
+  const {
+    username_admin,
+    password_admin,
+    confirm_password_admin,
+    nama_admin,
+    email_admin,
+  } = req.body;
   const schema = Joi.object({
     nama_restaurant: Joi.string().required().messages({
       "any.required": "Field tidak boleh kosong!",
@@ -193,8 +232,12 @@ router.post("/api/restaurant", [checkLogin], async (req, res) => {
       deskripsi,
     });
   } catch (error) {
-    let statusCode = 400;
-    return res.status(statusCode).send(error.toString());
+    let code = 400;
+    let errorMsg = error.toString().split(": ")[1];
+    errorMsg = errorMsg.split(" (")[0];
+    return res.status(code).json({
+      messages: errorMsg,
+    });
   }
 
   let sama = await Restaurant.findOne({
@@ -229,6 +272,78 @@ router.post("/api/restaurant", [checkLogin], async (req, res) => {
     resId.update({
       api_key: token,
     });
+
+    const schema = Joi.object({
+      username_admin: Joi.string().required().messages({
+        "any.required": "Field tidak boleh kosong!",
+        "string.empty": "Field tidak boleh kosong!",
+      }),
+      password_admin: Joi.string().min(8).required().messages({
+        "any.required": "Field tidak boleh kosong!",
+        "string.empty": "Field tidak boleh kosong!",
+        "string.min": "Password minimal 8 character",
+      }),
+      confirm_password_admin: Joi.string()
+        .valid(Joi.ref("password"))
+        .required()
+        .label("Confirm password")
+        .messages({
+          "any.only": "Password tidak cocok",
+          "any.required": "Field tidak boleh kosong!",
+          "string.empty": "Field tidak boleh kosong!",
+        }),
+      nama_admin: Joi.string().required().messages({
+        "any.required": "Field tidak boleh kosong!",
+        "string.empty": "Field tidak boleh kosong!",
+      }),
+      email_admin: Joi.string().email().required().messages({
+        "string.email": "Format email harus sesuai",
+        "any.required": "Field tidak boleh kosong!",
+        "string.empty": "Field tidak boleh kosong!",
+      }),
+    });
+
+    try {
+      await schema.validateAsync({
+        username: username_admin,
+        password: password_admin,
+        confirm_password: confirm_password_admin,
+        nama_member: nama_admin,
+        email: email_admin,
+      });
+    } catch (error) {
+      let statusCode = 400;
+      return res.status(statusCode).send(error.toString());
+    }
+
+    let usernameCheck = await Member.findOne({
+      where: {
+        username: username,
+        restaurant_id: req.body.restaurant.restaurant_id,
+      },
+    });
+
+    if (usernameCheck) {
+      return res.status(400).json({ messages: "Username already exist" });
+    }
+
+    let emailCheck = await Member.findOne({
+      where: { email: email, restaurant_id: req.body.restaurant.restaurant_id },
+    });
+
+    if (emailCheck) {
+      return res.status(400).json({ messages: "Email already exist" });
+    }
+    let bcrypt_password = await bcrypt.hashSync(password_admin, 10);
+
+    await Member.create({
+      restaurant_id: resId.restaurant_id,
+      username: username_admin,
+      password: bcrypt_password,
+      nama_member: nama_admin,
+      email: email_admin,
+      role: "admin",
+    });
     return res
       .status(201)
       .json({ messages: "Berhasil menambahkan Restaurant" });
@@ -237,14 +352,18 @@ router.post("/api/restaurant", [checkLogin], async (req, res) => {
   }
 });
 
-router.get("/api/restaurant", [checkLogin], async (req, res) => {
+router.get("/api/v1/restaurant", [checkLogin], async (req, res) => {
   let resto = await Restaurant.findAll({
     where: { owner_id: req.body.user.owner_id },
   });
-  return res.status(200).json({ Restaurant: resto });
+  if (resto) {
+    return res.status(200).json({ Restaurant: resto });
+  } else {
+    return res.status(200).json({ messages: "Anda tidak memiliki restaurant" });
+  }
 });
 
-router.get("/api/client", async (req, res) => {
+router.get("/api/v1/client", async (req, res) => {
   let client = await Owner.findAll();
   return res.status(200).json({ client: client });
 });

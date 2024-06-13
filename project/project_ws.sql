@@ -67,7 +67,7 @@ CREATE TABLE `H_trans` (
   `trans_id` int(11) NOT NULL AUTO_INCREMENT,
   `restaurant_id` int(11) NOT NULL,
   `member_id` int(11) NOT NULL,
-  `kupon_id` int(11) NOT NULL,
+  `kupon_id` int(11),
   `status_transaksi` int(5) NOT NULL, -- 0 br dibuat, 1 payment sdh lunas, 2 dibuat resto, 3 sukses, 4 gagal
   `subtotal` int(11) NOT NULL,
   `grand_total` int(11) NOT NULL,
@@ -128,9 +128,11 @@ DROP TABLE IF EXISTS `menu`;
 CREATE TABLE `menu` (
   `menu_id` int(11) NOT NULL AUTO_INCREMENT,
   `restaurant_id` int(11) NOT NULL,
+  `menu_picture` text,
   `nama_menu` varchar(255) NOT NULL,
   `deskripsi_menu` text NOT NULL,
   `harga_menu` int(11) NOT NULL,
+  `status` ENUM('active','habis','inactive') NOT NULL DEFAULT 'active',
   PRIMARY KEY (`menu_id`),
   KEY restaurant_id (restaurant_id),
   FOREIGN KEY (`restaurant_id`) REFERENCES `restaurant`(`restaurant_id`)
@@ -158,10 +160,12 @@ CREATE TABLE `topping` (
 
 DROP TABLE IF EXISTS `menu_item`;
 CREATE TABLE `menu_item` (
+  `menu_item_id` int(11) NOT NULL AUTO_INCREMENT,
   `restaurant_id` int(11) NOT NULL,
   `menu_id` int(11) NOT NULL,
   `item_id` int(11) NOT NULL,
   `needed_quantity` int(11) NOT NULL,
+  PRIMARY KEY (`menu_item_id`),
   KEY menu_id (menu_id),
   KEY item_id (item_id),
   KEY restaurant_id (restaurant_id),
@@ -178,6 +182,7 @@ DROP TABLE IF EXISTS `member`;
 CREATE TABLE `member` (
   `member_id` int(11) NOT NULL AUTO_INCREMENT,
   `restaurant_id` int(11) NOT NULL,
+  `member_picture` text,
   `username` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `nama_member` varchar(255) NOT NULL,
@@ -198,6 +203,7 @@ CREATE TABLE `kupon` (
   `restaurant_id` int(11) NOT NULL,
   `member_id` int(11) NOT NULL,
   `potongan` int(11) NOT NULL,
+  `masa_berlaku` DATE NOT NULL,
   PRIMARY KEY (`kupon_id`),
   KEY restaurant_id (restaurant_id),
   KEY member_id (member_id),

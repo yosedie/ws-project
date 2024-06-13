@@ -42,7 +42,7 @@ async function checkLogin(req, res, next) {
   const { username, password } = req.body;
   let user = await Owner.findOne({ where: { username: username } });
   if (user) {
-    let pwd = bcrypt.compare(password, user.password);
+    let pwd = await bcrypt.compare(password, user.password);
     if (pwd) {
       req.body.user = user;
       next();
@@ -59,7 +59,7 @@ async function checkLoginMember(req, res, next) {
   if (username && password) {
     let user = await Member.findOne({ where: { username: username } });
     if (user) {
-      let pwd = bcrypt.compare(password, user.password);
+      let pwd = await bcrypt.compare(password, user.password);
       if (pwd) {
         req.body.user = user;
         next();
@@ -75,7 +75,7 @@ async function checkLoginMember(req, res, next) {
 }
 
 router.post(
-  "/api/loginmember",
+  "/api/v1/loginmember",
   [checkApiKey, checkLoginMember],
   async (req, res) => {
     let user = req.body.user;
@@ -92,7 +92,7 @@ router.post(
   }
 );
 
-router.get("/api/api_key", [checkLogin], async (req, res) => {
+router.get("/api/v1/api_key", [checkLogin], async (req, res) => {
   const { nama_restaurant } = req.body;
   let user = req.body.user;
   if (nama_restaurant) {
@@ -112,7 +112,7 @@ router.get("/api/api_key", [checkLogin], async (req, res) => {
 });
 
 //mines restaurant_id
-router.post("/api/registermember", [checkApiKey], async (req, res) => {
+router.post("/api/v1/registermember", [checkApiKey], async (req, res) => {
   const { username, password, confirm_password, nama_member, email } = req.body;
   const schema = Joi.object({
     username: Joi.string().required().messages({

@@ -11,6 +11,10 @@ module.exports = {
         autoIncrement: true,
         primaryKey: true,
       },
+      menu_picture: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       nama_menu: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -26,6 +30,11 @@ module.exports = {
       harga_menu: {
         type: DataTypes.INTEGER,
         allowNull: false,
+      },
+      status: {
+        type: DataTypes.ENUM("active", "habis", "inactive"),
+        allowNull: false,
+        defaultValue: "active",
       },
     });
 

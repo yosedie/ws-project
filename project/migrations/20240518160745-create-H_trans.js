@@ -21,7 +21,7 @@ module.exports = {
       },
       kupon_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
       },
       status_transaksi: {
         type: DataTypes.INTEGER,
@@ -31,7 +31,7 @@ module.exports = {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      grandtotal: {
+      grand_total: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
