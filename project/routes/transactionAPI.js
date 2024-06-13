@@ -406,7 +406,7 @@ router.post("/api/topup", [checkLogin], async (req, res) => {
 router.post('/payment-webhook', async (req, res) => {
   const paymentInfo = req.body;
   if (paymentInfo.transaction_status === 'capture') {
-    if (paymentInfo.order_id.includes("SUBSCRIPTION") && loggedUser) {
+    if (paymentInfo.order_id.includes("TOPUP") && loggedUser) {
       if(Number.isInteger(loggedUser.owner_id) && Number.isInteger(loggedUser.api_hit)) {
         const owner = await Owner.findByPk(loggedUser.owner_id)
         if(owner) {
