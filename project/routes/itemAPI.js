@@ -14,6 +14,12 @@ const Member = require("../model/member.js");
 const Menu = require("../model/menu.js");
 const MenuItem = require("../model/menu_item.js");
 
+// import multer
+const multer = require("multer");
+const upload = multer({ dest: "./upload" });
+const path = require("path");
+const fs = require("fs");
+
 // relation
 Menu.belongsToMany(Item, {
   through: MenuItem,
@@ -500,6 +506,70 @@ router.post(
         .status(400)
         .json({ message: "gagal create menu " + newItem.nama_menu });
     }
+  }
+);
+
+//update picture menu
+router.put(
+  "/api/v1/menus/:id/picture",
+  [upload.single("picture"), checkApiKey, checkLoginAdmin, checkApiHit],
+  async function (req, res) {
+    let { id } = req.params;
+    let resto = req.body.resto;
+    let owner = req.body.owner;
+
+    let menu = await Menu.findOne({
+      where: {
+        menu_id: id,
+        restaurant_id: resto.restaurant_id,
+        status: "active",
+      },
+    });
+
+    if (!menu) {
+      return res.status(404).json("menu dengan id " + id + "tidak ditemukan");
+    }
+
+    const extension = path.extname(req.file.originalname);
+    const filename = `${menu.nama_menu}${extension}`;
+    fs.renameSync(`./upload/${req.file.filename}`, `./upload/menu/${filename}`);
+
+    let update = menu.update({
+      menu_picture: `upload/menu/${filename}`,
+    });
+
+    await kurangiApiHit(owner);
+
+    return res.status(200).json(filename);
+  }
+);
+
+router.get(
+  "/api/v1/menus/:id/picture",
+  [checkApiKey, checkApiHit],
+  async function (req, res) {
+    let { id } = req.params;
+    let resto = req.body.resto;
+    let owner = req.body.owner;
+
+    let menu = await Menu.findOne({
+      where: {
+        menu_id: id,
+        restaurant_id: resto.restaurant_id,
+        status: "active",
+      },
+    });
+
+    if (!menu) {
+      return res.status(404).json("menu dengan id " + id + "tidak ditemukan");
+    }
+
+    await kurangiApiHit(owner);
+
+    console.log("tes");
+    let image_path = path.join(__dirname, `../${menu.menu_picture}`);
+    // console.log(image_path);
+    res.sendFile(image_path);
   }
 );
 
