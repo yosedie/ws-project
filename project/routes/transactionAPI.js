@@ -303,37 +303,9 @@ router.get('/api/sumIncome', [checkApiKey, checkLogin], async (req, res) => {
     }
 });
 
-// Topup api hit / subscription [ADMIN]
-router.post('', [checkApiKey, checkLogin], async (req, res) => {
-    const { rupiah } = req.body;
-    const schema = Joi.object({
-        rupiah: Joi.number().integer().min(5).required().messages({
-            "any.required": "Field tidak boleh kosong!",
-            "number.base": "Field harus berupa angka!",
-            "number.min": "Field harus bernilai minimal 5!"
-        }),
-    });
-
-    try {
-        await schema.validateAsync({
-            rupiah,
-        });
-    } catch (error) {
-        let statusCode = 400;
-        return res.status(statusCode).send(error.toString());
-    }
-
-    try {
-        
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal Server Error" });
-    }
-});
-
 let loggedUser
 
-// Api topup for admin
+// Topup api hit / subscription [ADMIN]
 router.post("/api/topup", [checkLogin], async (req, res) => {
   const { rupiah } = req.body
   const midtransClient = require('midtrans-client');
