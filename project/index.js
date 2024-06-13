@@ -18,11 +18,13 @@ const clientLoginRouter = require("./routes/loginRegisterClient");
 const MemberLoginRouter = require("./routes/loginRegisterMember");
 const reviewApiRouter = require("./routes/reviewApi");
 const itemApiRouter = require("./routes/itemAPI");
+const transactionApiRouter = require("./routes/transactionAPI");
 
 app.use("/", clientLoginRouter);
 app.use("/", MemberLoginRouter);
 app.use("/", reviewApiRouter);
 app.use("/", itemApiRouter);
+app.use("/", transactionApiRouter);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

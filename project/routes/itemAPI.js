@@ -69,4 +69,6 @@ const Joi = require("joi").extend(require("@joi/date"));
     }
   });
   
+  // GET pending delivery 
+
   module.exports = router;

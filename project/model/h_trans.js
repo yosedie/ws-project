@@ -30,7 +30,7 @@ Htrans.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    grandtotal: {
+    grand_total: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
