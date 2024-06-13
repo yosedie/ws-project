@@ -199,14 +199,18 @@ router.put(
 );
 
 router.post("/api/v1/restaurant", [checkLogin], async (req, res) => {
-  const { nama_restaurant, alamat, deskripsi } = req.body;
   const {
+    nama_restaurant,
+    alamat,
+    deskripsi,
     username_admin,
     password_admin,
     confirm_password_admin,
     nama_admin,
     email_admin,
   } = req.body;
+  console.log(password_admin);
+  console.log(confirm_password_admin);
   const schema = Joi.object({
     nama_restaurant: Joi.string().required().messages({
       "any.required": "Field tidak boleh kosong!",
@@ -220,12 +224,44 @@ router.post("/api/v1/restaurant", [checkLogin], async (req, res) => {
       "any.required": "Field tidak boleh kosong!",
       "string.empty": "Field tidak boleh kosong!",
     }),
+    username_admin: Joi.string().required().messages({
+      "any.required": "Field tidak boleh kosong!",
+      "string.empty": "Field tidak boleh kosong!",
+    }),
+    password_admin: Joi.string().min(8).required().messages({
+      "any.required": "Field tidak boleh kosong!",
+      "string.empty": "Field tidak boleh kosong!",
+      "string.min": "Password minimal 8 character",
+    }),
+    confirm_password_admin: Joi.string()
+      .valid(Joi.ref("password_admin"))
+      .required()
+      .label("Confirm password")
+      .messages({
+        "any.only": "Password tidak cocok",
+        "any.required": "Field tidak boleh kosong!",
+        "string.empty": "Field tidak boleh kosong!",
+      }),
+    nama_admin: Joi.string().required().messages({
+      "any.required": "Field tidak boleh kosong!",
+      "string.empty": "Field tidak boleh kosong!",
+    }),
+    email_admin: Joi.string().email().required().messages({
+      "string.email": "Format email harus sesuai",
+      "any.required": "Field tidak boleh kosong!",
+      "string.empty": "Field tidak boleh kosong!",
+    }),
   });
   try {
     await schema.validateAsync({
       nama_restaurant,
       alamat,
       deskripsi,
+      username_admin: username_admin,
+      password_admin: password_admin,
+      confirm_password_admin: confirm_password_admin,
+      nama_admin: nama_admin,
+      email_admin: email_admin,
     });
   } catch (error) {
     let statusCode = 400;
@@ -265,53 +301,9 @@ router.post("/api/v1/restaurant", [checkLogin], async (req, res) => {
       api_key: token,
     });
 
-    const schema = Joi.object({
-      username_admin: Joi.string().required().messages({
-        "any.required": "Field tidak boleh kosong!",
-        "string.empty": "Field tidak boleh kosong!",
-      }),
-      password_admin: Joi.string().min(8).required().messages({
-        "any.required": "Field tidak boleh kosong!",
-        "string.empty": "Field tidak boleh kosong!",
-        "string.min": "Password minimal 8 character",
-      }),
-      confirm_password_admin: Joi.string()
-        .valid(Joi.ref("password"))
-        .required()
-        .label("Confirm password")
-        .messages({
-          "any.only": "Password tidak cocok",
-          "any.required": "Field tidak boleh kosong!",
-          "string.empty": "Field tidak boleh kosong!",
-        }),
-      nama_admin: Joi.string().required().messages({
-        "any.required": "Field tidak boleh kosong!",
-        "string.empty": "Field tidak boleh kosong!",
-      }),
-      email_admin: Joi.string().email().required().messages({
-        "string.email": "Format email harus sesuai",
-        "any.required": "Field tidak boleh kosong!",
-        "string.empty": "Field tidak boleh kosong!",
-      }),
-    });
-
-    try {
-      await schema.validateAsync({
-        username: username_admin,
-        password: password_admin,
-        confirm_password: confirm_password_admin,
-        nama_member: nama_admin,
-        email: email_admin,
-      });
-    } catch (error) {
-      let statusCode = 400;
-      return res.status(statusCode).send(error.toString());
-    }
-
     let usernameCheck = await Member.findOne({
       where: {
-        username: username,
-        restaurant_id: req.body.restaurant.restaurant_id,
+        username: username_admin,
       },
     });
 
@@ -320,7 +312,7 @@ router.post("/api/v1/restaurant", [checkLogin], async (req, res) => {
     }
 
     let emailCheck = await Member.findOne({
-      where: { email: email, restaurant_id: req.body.restaurant.restaurant_id },
+      where: { email: email_admin },
     });
 
     if (emailCheck) {
