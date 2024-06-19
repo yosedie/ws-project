@@ -129,7 +129,7 @@ router.post("/api/v1/register", async (req, res) => {
     name,
     email,
     no_telepon,
-    api_hit: 0,
+    api_hit: 10000,
   });
   return res.status(201).json({ messages: "Register Success" });
 });
