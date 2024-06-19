@@ -26,6 +26,24 @@ USE `project_ws`;
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `kupon`
+--
+
+DROP TABLE IF EXISTS `kupon`;
+CREATE TABLE `kupon` (
+  `kupon_id` int(11) NOT NULL AUTO_INCREMENT,
+  `restaurant_id` int(11) NOT NULL,
+  `member_id` int(11) NOT NULL,
+  `potongan` int(11) NOT NULL,
+  `masa_berlaku` DATE NOT NULL,
+  PRIMARY KEY (`kupon_id`),
+  KEY restaurant_id (restaurant_id),
+  KEY member_id (member_id),
+  FOREIGN KEY (`restaurant_id`) REFERENCES `restaurant`(`restaurant_id`),
+  FOREIGN KEY (`member_id`) REFERENCES `member`(`member_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
 -- Table structure for table `owner`
 --
 
@@ -191,24 +209,6 @@ CREATE TABLE `member` (
   PRIMARY KEY (`member_id`),
   KEY restaurant_id (restaurant_id),
   FOREIGN KEY (`restaurant_id`) REFERENCES `restaurant`(`restaurant_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Table structure for table `kupon`
---
-
-DROP TABLE IF EXISTS `kupon`;
-CREATE TABLE `kupon` (
-  `kupon_id` int(11) NOT NULL AUTO_INCREMENT,
-  `restaurant_id` int(11) NOT NULL,
-  `member_id` int(11) NOT NULL,
-  `potongan` int(11) NOT NULL,
-  `masa_berlaku` DATE NOT NULL,
-  PRIMARY KEY (`kupon_id`),
-  KEY restaurant_id (restaurant_id),
-  KEY member_id (member_id),
-  FOREIGN KEY (`restaurant_id`) REFERENCES `restaurant`(`restaurant_id`),
-  FOREIGN KEY (`member_id`) REFERENCES `member`(`member_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --

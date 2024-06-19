@@ -8,10 +8,12 @@ const Member = require("../model/member.js");
 const Restaurant = require("../model/restaurant.js");
 const Kupon = require("../model/kupon.js");
 const H_trans = require("../model/h_trans.js");
+const D_trans = require("../model/d_trans.js");
 const Item = require("../model/item.js");
 const jwt = require("jsonwebtoken");
 const JWT_KEY = "efgusguygyufegauiahf";
 const bcrypt = require("bcrypt");
+const Menu = require("../model/menu.js");
 const Joi = require("joi").extend(require("@joi/date"));
 
 async function checkApiKey(req, res, next) {
@@ -154,11 +156,63 @@ router.get(
   }
 );
 
+// Add H Trans [Member / Customer]
+router.post(
+  "/api/addHTrans",
+  [checkLoginMember, checkApiKey],
+  async (req, res) => {
+    try {
+      const menuList = Object.keys(req.body).filter((key) => Number(key))
+      const menuListQuantity = Object.values(req.body).slice(menuList)
+
+      if(menuList.length === 0) {
+        return res.status(400).send("Menu yang dipesan kosong !")
+      }
+
+      const HTrans = await H_trans.create({
+        restaurant_id: req.body.restaurant.restaurant_id,
+        member_id: req.body.user.member_id,
+        status_transaksi: 0,
+        subtotal: 0,
+        grand_total: 0,
+      });
+
+      let grandTotal = 0
+
+      for (let index = 0; index < menuList.length; index++) {
+        const Menu_single = await Menu.findOne({ where: { menu_id: menuList[index] } });
+        console.log(parseInt(Menu_single.harga_menu))
+        if(Menu_single) {
+          await D_trans.create({
+            trans_id: HTrans.trans_id,
+            menu_id: menuList[index],
+            quantitas: parseInt(menuListQuantity[index]),
+            subtotal: parseInt(Menu_single.harga_menu) * parseInt(menuListQuantity[index]),
+          });
+          grandTotal += (parseInt(menuListQuantity[index]) * parseInt(Menu_single.harga_menu))
+        }
+      }
+
+      HTrans.subtotal = grandTotal;
+      HTrans.grand_total = grandTotal;
+      HTrans.status_transaksi = 2;
+      HTrans.save();
+      return res.status(200).json({
+        "message": "Sukses menambahkan ke HTrans"
+      })
+    } catch (e) {
+      console.error(e);
+      return res.status(500).send(e.message);
+    }
+  }
+)
+
 // Checkout [Member / Customer]
 router.post(
   "/api/checkout",
   [checkLoginMember, checkApiKey],
   async (req, res) => {
+    const midtransClient = require("midtrans-client");
     try {
       const restaurantId = req.body.restaurant.restaurant_id;
       const transactions = await H_trans.findAll({
@@ -215,7 +269,7 @@ router.post(
               return {
                 "Restaurant Name": restaurant.nama_restaurant,
                 "Member Name": req.body.user.nama_member,
-                Subtotal: trans.subtotal,
+                "Grand Total": trans.grand_total,
                 redirect_url: chargeResponse.redirect_url,
               };
             }
